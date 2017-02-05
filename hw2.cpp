@@ -5,90 +5,66 @@
 
 #include <stdio.h>
 #include <iostream>
-#include <string>
 #include <vector>
 #include <stdlib.h>
-#include <time.h>
 #include <assert.h>
 #include <random>
 #include <iomanip>
 #include <cmath>
+#include "Classes.h"
 
-#define PI_ (double) 3.14159265358979323846
-#define ZERO_TO_ONE (double)rand()/RAND_MAX
+//#define PI_ (double) 3.14159265358979323846
+//#define ZERO_TO_ONE (double)rand()/RAND_MAX
 
 using namespace std;
 
-//===============================================
-//	Class definitions
-//===============================================
-
-class MAB {
-	double mean;
-	double std;
-	public:
-		MAB(bool);
-		double pull();
-		void set_values(bool);
-		void display();
-};
-
-void MAB::set_values(bool randomize) {
-	if (randomize) {
-		mean = (ZERO_TO_ONE-0.5)*50;
-		std = ZERO_TO_ONE*25;
-	} else {
-		mean = 0;
-		std = 1;
-	}
-}
-
-MAB::MAB(bool randomize) {
-	set_values(randomize);
-}
-
-
-double MAB::pull() {
-	double output;
-	double U1 = ZERO_TO_ONE, U2 = ZERO_TO_ONE;
-	output = (sqrt((double)-2*log(U1))*sin(2*PI_*U2))*std+mean;
-	return output;
-}
-
-void MAB::display() {
-	cout.fill(' '); cout.width(12);
-	cout << "mean = " << mean << '\t';
-	cout << "std  = " << std << "\n\n";
-}
 
 //===============================================
 //	Main Function
 //===============================================
 
 int main(int argc, char * argv[]) {
+	FILE *fp;
 	MAB dummy (false);
 	vector<MAB> MAB_list;
+	vector<double> mean_list;
+	int answer;
 	int input;
+	int n = 3;
 
 	srand(time(NULL));
-	for (int i = 0; i < 3; i++) {
+	fp = fopen("MAB_Data_Log.txt", "w+");
+	//cout << "How many arms do you want?\n>> ";
+	//cin >> n;
+	//*
+	for (int i = 0; i < n; i++) {
 		dummy.set_values(true);
 		MAB_list.push_back(dummy);
+		mean_list.push_back(dummy.get_mean());
 	}
+	answer = maximum(mean_list)+1;
+	//*/
+	/*
+	dummy.set_values(28.6305, 1.19668);	MAB_list.push_back(dummy);
+	dummy.set_values(17.8945, 7.85031);	MAB_list.push_back(dummy);
+	dummy.set_values(16.375, 5.42013);	MAB_list.push_back(dummy);
+	//*/
 
-	while (1) {
-		cout << ">> ";
-		cin >> input;
-		if (!(input >= 1 && input <= MAB_list.size())) {
-			cout << "NOT IN RANGE!\nENDING PROGRAM!\n\n";
-			break;
-		}
-		cout << "You get: " << MAB_list.at(input-1).pull() << endl;
+	Learner Bob (n,1,0.1,n*10);
+	Bob.search_values(MAB_list,fp);
+	fprintf(fp, "   Actual answer: %d", answer);
+	cout << "The acutal answer is: " << answer << endl;
+	fprintf(fp, "\n\n===== MAB DATA ====\n");
+	for (int i = 0; i < MAB_list.size(); i++) {
+		fprintf(fp, "%2d) ", i+1);
+		MAB_list.at(i).M_display(fp);		
 	}
-	cout << "Here are the results:\n";
-	for (int i = 0; i < 3; i++) {
-		MAB_list.at(i).display();
+	Bob.L_display(fp);
+	for (int i = 0; i < n; i++) {
+		MAB_list.at(i).TestA();
 	}
+	cout << endl;
+	fclose(fp);
 
 	return 0;
 }
