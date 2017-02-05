@@ -6,7 +6,7 @@
 
 void MAB::set_values(bool randomize) {
 	if (randomize) {
-		mean = (ZERO_TO_ONE-0.25)*50;
+		mean = (ZERO_TO_ONE-0.5)*50;
 		std = ZERO_TO_ONE*5;
 	} else {
 		mean = 0;
@@ -86,26 +86,26 @@ Learner::Learner(int n, double a, double e, int t) {
 	}
 }
 
-void Learner::search_values(vector<MAB> list, FILE *fp) {
+void Learner::search_values(vector<MAB> list, FILE *ans, FILE *p) {
 	int index;
 	double val;
-
+	fprintf(p, "====================\nIteration %d)\n====================\n\n", 1);
 	for (int i = 0; i < trials; i++) {
 		if (i >= trials*(1-epsilon)) {
 			index = max_avg(arms,rewards,length);
-			//cout << "Selectively pull arm #";
+			fprintf(p, "O) ");
 		} else {
 			index = rand()%arms;
-			//cout << "   Randomly pull arm #";
+			fprintf(p, "R) ");
 		}
 		assert(index >= 0 && index < arms);
 		val = list.at(index).pull();
-		//cout << index+1 << " and got a value of " << val << endl;
+		fprintf(p, "%2d   =   %10f\n", index+1, val);
 		rewards.at(index) += val;
 		length.at(index)++;
 	}
 	guess = max_avg(arms,rewards,length) + 1;
-	fprintf(fp, "Learner's answer: %d\n", guess);
+	fprintf(ans, "Learner's answer: %d\n", guess);
 	cout << "\n============================\nLearner's guess is arm #" << guess << "\n============================\n" << endl;
 }
 

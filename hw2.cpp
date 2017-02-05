@@ -24,16 +24,17 @@ using namespace std;
 //===============================================
 
 int main(int argc, char * argv[]) {
-	FILE *fp;
+	FILE *data_log, *pull_log;
 	MAB dummy (false);
 	vector<MAB> MAB_list;
 	vector<double> mean_list;
 	int answer;
 	int input;
-	int n = 3;
+	int n = 5;
 
 	srand(time(NULL));
-	fp = fopen("MAB_Data_Log.txt", "w+");
+	data_log = fopen("MAB_Data_Log.txt", "w+");
+	pull_log = fopen("Learner_Pull_Log.txt", "w+");
 	//cout << "How many arms do you want?\n>> ";
 	//cin >> n;
 	//*
@@ -51,20 +52,20 @@ int main(int argc, char * argv[]) {
 	//*/
 
 	Learner Bob (n,1,0.1,n*10);
-	Bob.search_values(MAB_list,fp);
-	fprintf(fp, "   Actual answer: %d", answer);
+	Bob.search_values(MAB_list,data_log,pull_log);
+	fprintf(data_log, "   Actual answer: %d", answer);
 	cout << "The acutal answer is: " << answer << endl;
-	fprintf(fp, "\n\n===== MAB DATA ====\n");
+	fprintf(data_log, "\n\n===== MAB DATA ====\n");
 	for (int i = 0; i < MAB_list.size(); i++) {
-		fprintf(fp, "%2d) ", i+1);
-		MAB_list.at(i).M_display(fp);		
+		fprintf(data_log, "%2d) ", i+1);
+		MAB_list.at(i).M_display(data_log);		
 	}
-	Bob.L_display(fp);
+	Bob.L_display(data_log);
 	for (int i = 0; i < n; i++) {
 		MAB_list.at(i).TestA();
 	}
 	cout << endl;
-	fclose(fp);
+	fclose(data_log);
 
 	return 0;
 }

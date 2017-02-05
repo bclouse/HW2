@@ -51,7 +51,7 @@ class Learner {
 	public:
 		Learner();
 		Learner(int, double, double, int);
-		void search_values(vector<MAB>, FILE*);
+		void search_values(vector<MAB>, FILE*, FILE*);
 		//void L_display();
 		void L_display(FILE*);
 		bool compare_answer(int);
