@@ -30,31 +30,23 @@ int main(int argc, char * argv[]) {
 	vector<double> mean_list;
 	int answer;
 	int input;
-	int n = 5;
+	int n = 20;
 
 	srand(time(NULL));
 	data_log = fopen("MAB_Data_Log.txt", "w+");
 	pull_log = fopen("Learner_Pull_Log.txt", "w+");
-	//cout << "How many arms do you want?\n>> ";
-	//cin >> n;
-	//*
+	
 	for (int i = 0; i < n; i++) {
 		dummy.set_values(true);
 		MAB_list.push_back(dummy);
 		mean_list.push_back(dummy.get_mean());
 	}
 	answer = maximum(mean_list)+1;
-	//*/
-	/*
-	dummy.set_values(28.6305, 1.19668);	MAB_list.push_back(dummy);
-	dummy.set_values(17.8945, 7.85031);	MAB_list.push_back(dummy);
-	dummy.set_values(16.375, 5.42013);	MAB_list.push_back(dummy);
-	//*/
 
-	Learner Bob (n,1,0.1,n*10);
+	Learner Bob (n,0.1,0.1,n*10);
 	Bob.search_values(MAB_list,data_log,pull_log);
 	fprintf(data_log, "   Actual answer: %d", answer);
-	cout << "The acutal answer is: " << answer << endl;
+	cout << "The acutal answer is: " << answer;
 	fprintf(data_log, "\n\n===== MAB DATA ====\n");
 	for (int i = 0; i < MAB_list.size(); i++) {
 		fprintf(data_log, "%2d) ", i+1);

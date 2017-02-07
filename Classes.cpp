@@ -106,7 +106,7 @@ void Learner::search_values(vector<MAB> list, FILE *ans, FILE *p) {
 	}
 	guess = max_avg(arms,rewards,length) + 1;
 	fprintf(ans, "Learner's answer: %d\n", guess);
-	cout << "\n============================\nLearner's guess is arm #" << guess << "\n============================\n" << endl;
+	cout << "============================\nLearner's guess is arm #" << guess << "\n============================\n" << endl;
 }
 
 // void Learner::L_display() {
