@@ -102,16 +102,16 @@ void Learner::action(vector<MAB> list, int sr, FILE *ans, FILE *p) {
 			//fprintf(p, "   =   %10f\n", val);
 			rewards.at(index) = val*alpha + rewards.at(index)*(1-alpha);
 			length.at(index)++;
-			if (i%50 == 0) {
-				alpha*=0.9;
-			}
+			// if (i%50 == 0) {
+			// 	alpha*=0.9;
+			// }
 		}
 
 		dummy = maximum(rewards);									//Checks for the best arm and makes it the Learner's guess
 		if (dummy.size() == 1) {
 			guess = dummy.at(0)+1;
 			L_display(ans);
-			cout << "Learner's guess: " << guess << endl;
+			printf("SR: %2d) Learner's Guess: %d\n", j+1, guess);
 		} else {
 			guess = -1;
 			fprintf(ans, "No guess yet\n");
