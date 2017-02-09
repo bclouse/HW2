@@ -31,12 +31,6 @@ double MAB::pull() {
 	return output;
 }
 
-// void MAB::M_display() {
-// 	cout.fill(' '); cout.width(12);
-// 	cout << "mean = " << mean << '\t';
-// 	cout << "std  = " << std << "\n\n";
-// }
-
 void MAB::M_display(FILE *fp) {
 	fprintf(fp, "MEAN = %10f\tSTD = %8f\n", mean,std);
 }
@@ -45,11 +39,11 @@ double MAB::get_mean() {
 	return mean;
 }
 
-void MAB::TestA() {
+void MAB::TestA(double a) {
 	int l = 100000;
 	double average;
 	for (int i = 0; i < l; i++) {
-		average += pull();
+		average = pull()*a + average*(1-a);
 	}
 	average /= l;
 	//cout << ": " << average << endl;
@@ -86,43 +80,63 @@ Learner::Learner(int n, double a, double e, int t) {
 	}
 }
 
-void Learner::search_values(vector<MAB> list, FILE *ans, FILE *p) {
+void Learner::action(vector<MAB> list, int sr, FILE *ans, FILE *p) {
 	int index;
+	vector<int> dummy;
 	double val;
-	fprintf(p, "====================\nIteration %d)\n====================\n\n", 1);
-	for (int i = 0; i < trials; i++) {
-		if (i >= trials*(1-epsilon)) {
-			index = max_avg(arms,rewards,length);
-			fprintf(p, "O) ");
-		} else {
-			index = rand()%arms;
-			fprintf(p, "R) ");
+	double alpha_ = alpha;
+
+	for (int j = 0; j < sr; j++) {
+		//fprintf(p, "====================\nIteration %d)\n====================\n\n", j);
+		for (int i = 0; i < trials; i++) {
+			if (ZERO_TO_ONE >= epsilon) {			//Determines if the value picked should be random or optimal
+				index = rand()%arms;
+				//fprintf(p, "  %2d", index+1);
+			} else {
+				dummy = maximum(rewards);
+				index = dummy.at(rand()%dummy.size());
+				//fprintf(p, "->%2d", index+1);
+			}
+			assert(index >= 0 && index < arms);
+			val = list.at(index).pull();												//Stores the random number in "val"
+			//fprintf(p, "   =   %10f\n", val);
+			rewards.at(index) = val*alpha + rewards.at(index)*(1-alpha);
+			length.at(index)++;
+			if (i%50 == 0) {
+				alpha*=0.9;
+			}
 		}
-		assert(index >= 0 && index < arms);
-		val = list.at(index).pull();
-		fprintf(p, "%2d   =   %10f\n", index+1, val);
-		rewards.at(index) += val;
-		length.at(index)++;
+
+		dummy = maximum(rewards);									//Checks for the best arm and makes it the Learner's guess
+		if (dummy.size() == 1) {
+			guess = dummy.at(0)+1;
+			L_display(ans);
+			cout << "Learner's guess: " << guess << endl;
+		} else {
+			guess = -1;
+			fprintf(ans, "No guess yet\n");
+			L_display(ans);
+		}
+
+		for (int i = 0; i < rewards.size(); i++) {			//Resets all of the values to 0 and resents the alpha
+			rewards.at(i) = 0;
+			length.at(i) = 0;
+			alpha = alpha_;
+		}
 	}
-	guess = max_avg(arms,rewards,length) + 1;
-	fprintf(ans, "Learner's answer: %d\n", guess);
-	cout << "============================\nLearner's guess is arm #" << guess << "\n============================\n" << endl;
 }
 
-// void Learner::L_display() {
-// 	for (int i = 0; i < arms; i++) {
-// 		cout << "Arm #" << i+1 << "'s total rewards are: " << rewards.at(i) << endl;
-// 		cout << "\tAverage = " << rewards.at(i)/length.at(i) << endl;
-
-// 	}
-// }
+void Learner::L_display() {
+	for (int i = 0; i < arms; i++) {
+		cout << "Arm #" << i+1 << "'s total rewards are: " << rewards.at(i) << endl;
+		cout << "\tAverage = " << rewards.at(i)/length.at(i) << endl;
+	}
+}
 
 void Learner::L_display(FILE *fp) {
-	double avg;
-	fprintf(fp, "\n===== LEARNER DATA ====\n");
+	fprintf(fp, "\n========= LEARNER DATA (%02d) =========\n", guess);
 	for (int i = 0; i < arms; i++) {
-		avg = rewards.at(i)/length.at(i);
-		fprintf(fp, "%2d) Average: %10f\t\tPulls: %d\n", i+1, avg, length.at(i));
+		fprintf(fp, "%2d) Rewards: %10f\t\tPulls: %d\n", i+1, rewards.at(i), length.at(i));
 	}
 }
 
@@ -130,18 +144,22 @@ void Learner::L_display(FILE *fp) {
 //	Function Definitions
 //===============================================
 
-int maximum(vector<double> list) {
-	int max = 0;
+vector<int> maximum(vector<double> list) {
+	vector<int> max;
 
+	max.push_back(0);
 	for (int i = 1; i < list.size(); i++) {
-		if (list.at(i) > list.at(max)) {
-			max = i;
+		if (list.at(i) > list.at(max.at(0))) {
+			max.clear();
+			max.push_back(i);
+		} else if (list.at(i) == list.at(max.at(0))) {
+			max.push_back(i);
 		}
 	}
 	return max;
 }
-
-int max_avg(int n, vector<double> list, vector<int> num) {
+/*
+vector<int> max_avg(int n, vector<double> list, vector<int> num) {
 	int max = 0;
 	double avg_new,avg_max = list.at(0)/num.at(0);
 	//cout << "Printing Averages\n";
@@ -158,3 +176,4 @@ int max_avg(int n, vector<double> list, vector<int> num) {
 	//cout << "================================\n";
 	return max;
 }
+*/

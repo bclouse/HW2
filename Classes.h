@@ -31,7 +31,7 @@ class MAB {
 			//void M_display();
 			void M_display(FILE*);
 			double get_mean();
-			void TestA();
+			void TestA(double);
 			void TestB();
 };
 
@@ -51,8 +51,8 @@ class Learner {
 	public:
 		Learner();
 		Learner(int, double, double, int);
-		void search_values(vector<MAB>, FILE*, FILE*);
-		//void L_display();
+		void action(vector<MAB>, int,FILE*, FILE*);
+		void L_display();
 		void L_display(FILE*);
 		bool compare_answer(int);
 };
@@ -61,7 +61,7 @@ class Learner {
 //	Function definition
 //===============================================
 
-int maximum(vector<double>);
+vector<int> maximum(vector<double>);
 int max_avg(int, vector<double>, vector<int>);
 
 #endif

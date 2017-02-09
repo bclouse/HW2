@@ -28,9 +28,10 @@ int main(int argc, char * argv[]) {
 	MAB dummy (false);
 	vector<MAB> MAB_list;
 	vector<double> mean_list;
-	int answer;
+	vector<int> answer;
 	int input;
 	int n = 20;
+	int sr;
 
 	srand(time(NULL));
 	data_log = fopen("MAB_Data_Log.txt", "w+");
@@ -41,23 +42,25 @@ int main(int argc, char * argv[]) {
 		MAB_list.push_back(dummy);
 		mean_list.push_back(dummy.get_mean());
 	}
-	answer = maximum(mean_list)+1;
+	answer = maximum(mean_list);
 
-	Learner Bob (n,0.1,0.1,n*10);
-	Bob.search_values(MAB_list,data_log,pull_log);
-	fprintf(data_log, "   Actual answer: %d", answer);
-	cout << "The acutal answer is: " << answer;
-	fprintf(data_log, "\n\n===== MAB DATA ====\n");
+	Learner Bob (n,0.1,0.1,2000);
+	cout << "How many Statistical Runs do you want? ";
+	cin >> sr;
+	cout << "The acutal answer is: " << answer.at(0)+1 << endl;
+	fprintf(data_log, "  Actual answer: %d\n", answer.at(0)+1);
+	fprintf(data_log, "\n===== MAB DATA =====\n");
 	for (int i = 0; i < MAB_list.size(); i++) {
 		fprintf(data_log, "%2d) ", i+1);
 		MAB_list.at(i).M_display(data_log);		
 	}
-	Bob.L_display(data_log);
-	for (int i = 0; i < n; i++) {
-		MAB_list.at(i).TestA();
-	}
-	cout << endl;
+	Bob.action(MAB_list,sr,data_log,pull_log);
+	//Bob.L_display(data_log);
+	// for (int i = 0; i < n; i++) {
+	// 	MAB_list.at(i).TestA(0.01);
+	// }
 	fclose(data_log);
+	fclose(pull_log);
 
 	return 0;
 }
