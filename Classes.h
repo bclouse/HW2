@@ -51,8 +51,8 @@ class Learner {
 	public:
 		Learner();
 		Learner(int, double, double, int);
-		void action(vector<MAB>, int,FILE*, FILE*);
-		void L_display();
+		void action(vector<MAB>, int,FILE*);
+		void learn_log(FILE*, int);
 		void L_display(FILE*);
 		bool compare_answer(int);
 };

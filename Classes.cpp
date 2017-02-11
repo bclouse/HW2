@@ -80,14 +80,18 @@ Learner::Learner(int n, double a, double e, int t) {
 	}
 }
 
-void Learner::action(vector<MAB> list, int sr, FILE *ans, FILE *p) {
+void Learner::action(vector<MAB> list, int sr, FILE *ans) {
 	int index;
 	vector<int> dummy;
 	double val;
 	double alpha_ = alpha;
+	FILE *log;
+	char fname[] = "Learning_Curve_00.txt";
 
 	for (int j = 0; j < sr; j++) {
-		//fprintf(p, "====================\nIteration %d)\n====================\n\n", j);
+		fname[15] = (char) (((j+1)/10)%10)+'0';
+		fname[16] = (char) ((j+1)%10)+'0';
+		log = fopen(fname,"w");
 		for (int i = 0; i < trials; i++) {
 			if (ZERO_TO_ONE >= epsilon) {			//Determines if the value picked should be random or optimal
 				index = rand()%arms;
@@ -102,9 +106,7 @@ void Learner::action(vector<MAB> list, int sr, FILE *ans, FILE *p) {
 			//fprintf(p, "   =   %10f\n", val);
 			rewards.at(index) = val*alpha + rewards.at(index)*(1-alpha);
 			length.at(index)++;
-			// if (i%50 == 0) {
-			// 	alpha*=0.9;
-			// }
+			learn_log(log,i+1);
 		}
 
 		dummy = maximum(rewards);									//Checks for the best arm and makes it the Learner's guess
@@ -117,7 +119,7 @@ void Learner::action(vector<MAB> list, int sr, FILE *ans, FILE *p) {
 			fprintf(ans, "No guess yet\n");
 			L_display(ans);
 		}
-
+		fclose(log);
 		for (int i = 0; i < rewards.size(); i++) {			//Resets all of the values to 0 and resents the alpha
 			rewards.at(i) = 0;
 			length.at(i) = 0;
@@ -126,11 +128,12 @@ void Learner::action(vector<MAB> list, int sr, FILE *ans, FILE *p) {
 	}
 }
 
-void Learner::L_display() {
-	for (int i = 0; i < arms; i++) {
-		cout << "Arm #" << i+1 << "'s total rewards are: " << rewards.at(i) << endl;
-		cout << "\tAverage = " << rewards.at(i)/length.at(i) << endl;
+void Learner::learn_log(FILE *fp,int iter) {
+	fprintf(fp,"%d", iter);
+	for (int k = 0; k < arms; k++) {
+		fprintf(fp,"\t%f",rewards.at(k));
 	}
+	fprintf(fp,"\n");
 }
 
 void Learner::L_display(FILE *fp) {
