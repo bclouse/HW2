@@ -24,15 +24,13 @@ class MAB {
 		double mean;
 		double std;
 	public:
-			MAB(bool);
-			double pull();
-			void set_values(bool);
-			void set_values(double, double);
-			//void M_display();
-			void M_display(FILE*);
-			double get_mean();
-			void TestA(double);
-			void TestB();
+		MAB(bool);
+		double pull();
+		void set_values(bool);
+		void set_values(double, double);
+		void M_display(FILE*);
+		double get_mean();
+		void TestA(double);
 };
 
 //===============================================
@@ -51,10 +49,11 @@ class Learner {
 	public:
 		Learner();
 		Learner(int, double, double, int);
-		void action(vector<MAB>, int,FILE*);
+		void action(vector<MAB>, int,FILE*,int);
 		void learn_log(FILE*, int);
 		void L_display(FILE*);
 		bool compare_answer(int);
+		void TestB(int**, int, int);
 };
 
 //===============================================

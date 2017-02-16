@@ -47,11 +47,7 @@ void MAB::TestA(double a) {
 	}
 	average /= l;
 	//cout << ": " << average << endl;
-	assert((average >= average - 0.1) && (average <= average+0.1));
-}
-
-void MAB::TestB() {
-	//cout << "TestB" << endl;
+	assert((average >= average - 1) && (average <= average+1));
 }
 
 //===============================================
@@ -80,7 +76,7 @@ Learner::Learner(int n, double a, double e, int t) {
 	}
 }
 
-void Learner::action(vector<MAB> list, int sr, FILE *ans) {
+void Learner::action(vector<MAB> list, int sr, FILE *ans, int best_arm) {
 	int index;
 	vector<int> dummy;
 	vector<double> l_curve;
@@ -156,6 +152,14 @@ void Learner::L_display(FILE *fp) {
 	}
 }
 
+void Learner::TestB(int **array, int sr, int answer) {
+	for (int i = 0; i < arms; i++) {
+		if (i != answer) {
+			assert(array[trials-1][i]/sr < array[trials-1][answer]);
+		}
+	}
+}
+
 //===============================================
 //	Function Definitions
 //===============================================
@@ -182,22 +186,3 @@ double **give_2D_array(int n, int m) {
 	}
 	return arr;
 }
-/*
-vector<int> max_avg(int n, vector<double> list, vector<int> num) {
-	int max = 0;
-	double avg_new,avg_max = list.at(0)/num.at(0);
-	//cout << "Printing Averages\n";
-	//cout << avg_max << endl;
-
-	for (int i = 1; i < list.size(); i++) {
-		avg_new = list.at(i)/num.at(i);
-		//cout << avg_new << endl;
-		if (avg_new > avg_max) {
-			max = i;
-			avg_max = avg_new;
-		}
-	}
-	//cout << "================================\n";
-	return max;
-}
-*/
