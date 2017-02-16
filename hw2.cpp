@@ -27,7 +27,7 @@ int main(int argc, char * argv[]) {
 	vector<double> mean_list;
 	vector<int> answer;
 	int input;
-	int n = 10, sr = 5, t = 1000;
+	int n = 3, sr = 30, t = 1000;
 
 	srand(time(NULL));
 	data_log = fopen("MAB_Data_Log.txt", "w+");
@@ -38,12 +38,21 @@ int main(int argc, char * argv[]) {
 	cin >> t;
 	cout << "How many Statistical Runs do you want? (1-50) ";
 	cin >> sr;
-	//*/
 	for (int i = 0; i < n; i++) {
 		dummy.set_values(true);
 		MAB_list.push_back(dummy);
 		mean_list.push_back(dummy.get_mean());
 	}
+	//*/
+	dummy.set_values(5,1);
+	MAB_list.push_back(dummy);
+	mean_list.push_back(dummy.get_mean());
+	dummy.set_values(15,1);
+	MAB_list.push_back(dummy);
+	mean_list.push_back(dummy.get_mean());
+	dummy.set_values(45,1);
+	MAB_list.push_back(dummy);
+	mean_list.push_back(dummy.get_mean());
 	answer = maximum(mean_list);
 
 	Learner Bob (n,0.1,0.1,t);

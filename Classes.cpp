@@ -6,7 +6,7 @@
 
 void MAB::set_values(bool randomize) {
 	if (randomize) {
-		mean = (ZERO_TO_ONE-0.5)*50;
+		mean = (ZERO_TO_ONE)*50;
 		std = ZERO_TO_ONE*5;
 	} else {
 		mean = 0;
@@ -83,30 +83,31 @@ Learner::Learner(int n, double a, double e, int t) {
 void Learner::action(vector<MAB> list, int sr, FILE *ans) {
 	int index;
 	vector<int> dummy;
+	vector<double> l_curve;
 	double val;
 	double alpha_ = alpha;
 	FILE *log;
-	char fname[] = "Learning_Curve_00.txt";
+	char fname[] = "Learning_Curve.txt";
+	double **array = give_2D_array(trials,arms);
 
 	for (int j = 0; j < sr; j++) {
-		fname[15] = (char) (((j+1)/10)%10)+'0';
-		fname[16] = (char) ((j+1)%10)+'0';
-		log = fopen(fname,"w");
 		for (int i = 0; i < trials; i++) {
-			if (ZERO_TO_ONE >= epsilon) {			//Determines if the value picked should be random or optimal
+			if (ZERO_TO_ONE <= epsilon) {			//Determines if the value picked should be random or optimal
 				index = rand()%arms;
-				//fprintf(p, "  %2d", index+1);
 			} else {
 				dummy = maximum(rewards);
 				index = dummy.at(rand()%dummy.size());
-				//fprintf(p, "->%2d", index+1);
 			}
+			array[i][index]+=1;
 			assert(index >= 0 && index < arms);
 			val = list.at(index).pull();												//Stores the random number in "val"
-			//fprintf(p, "   =   %10f\n", val);
 			rewards.at(index) = val*alpha + rewards.at(index)*(1-alpha);
 			length.at(index)++;
-			learn_log(log,i+1);
+			if (j == 0) {
+				l_curve.push_back(val);
+			} else {
+				l_curve[i] += val;
+			}
 		}
 
 		dummy = maximum(rewards);									//Checks for the best arm and makes it the Learner's guess
@@ -119,13 +120,25 @@ void Learner::action(vector<MAB> list, int sr, FILE *ans) {
 			fprintf(ans, "No guess yet\n");
 			L_display(ans);
 		}
-		fclose(log);
 		for (int i = 0; i < rewards.size(); i++) {			//Resets all of the values to 0 and resents the alpha
 			rewards.at(i) = 0;
 			length.at(i) = 0;
 			alpha = alpha_;
 		}
 	}
+
+	log = fopen(fname,"w+");
+	FILE *action = fopen("Action_Curve.txt","w+");
+	for (int i = 0; i < trials; i++) {
+		fprintf(log, "%d\t%f\n", i, l_curve[i]/sr);
+		fprintf(action,"%d",i);
+		for (int j = 0; j < arms; j++) {
+			fprintf(action,"\t%f",array[i][j]/sr);
+		}
+		fprintf(action,"\n");
+	}
+	fclose(log);
+	fclose(action);
 }
 
 void Learner::learn_log(FILE *fp,int iter) {
@@ -160,6 +173,14 @@ vector<int> maximum(vector<double> list) {
 		}
 	}
 	return max;
+}
+
+double **give_2D_array(int n, int m) {
+	double **arr = new double* [n]();
+	for (int i = 0; i < n; i++) {
+		arr[i] = new double [m]();
+	}
+	return arr;
 }
 /*
 vector<int> max_avg(int n, vector<double> list, vector<int> num) {

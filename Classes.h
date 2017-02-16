@@ -62,6 +62,6 @@ class Learner {
 //===============================================
 
 vector<int> maximum(vector<double>);
-int max_avg(int, vector<double>, vector<int>);
+double **give_2D_array(int,int);
 
 #endif
